@@ -1,0 +1,13 @@
+# Lokale Umgebungsvariablen und Zugangsdaten
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Frontend
+node_modules/
+dist/
