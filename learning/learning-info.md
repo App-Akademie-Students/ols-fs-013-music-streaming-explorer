@@ -27,3 +27,34 @@
 > **sql-guidelines.md** – SQL-Vorgaben
 > 
 > **examples.md** – Musterlösungen
+
+
+
+# Datenstrukturen
+## AnalysisRequest
+
+| Eigenschaft | Frontend | Backend (FastAPI) | LLM |
+|---|---|---|---|
+| `question: str` | Liest die Frage aus dem Eingabefeld und sendet sie als JSON. | Liest und validiert den Request mit Pydantic. Anschließend baut es aus der Frage und dem SQLite-Schema den Prompt. | Liest die Frage im Prompt und erzeugt die passende SQL-Abfrage. |
+
+{
+  "question": "Welche zwei Künstler wurden am häufigsten gestreamt?"
+}
+
+## AnalysisResponse
+
+| Eigenschaft | LLM | Backend und SQLite | Frontend |
+|---|---|---|---|
+| `question` | Liest die Benutzerfrage im Prompt und leitet daraus die SQL-Abfrage ab. | Nimmt die Frage aus dem Request, übergibt sie ans LLM und übernimmt sie in die Antwort. | Sendet die Frage und kann sie über dem Ergebnis anzeigen. |
+| `generated_sql` | Erzeugt die SQL-Abfrage. | Prüft die Abfrage, führt sie in SQLite aus und gibt sie in der Antwort zurück. | Kann die SQL-Abfrage zur Nachvollziehbarkeit anzeigen. |
+| `columns` | Kann die Namen durch SQL-Aliase wie `AS stream_count` festlegen. | Liest die Spaltennamen aus dem SQLite-Ergebnis. | Nutzt die Namen für die Tabellenüberschriften und die Spaltenreihenfolge. |
+| `rows` | Kann die Ergebniswerte in einem optionalen zweiten Aufruf zusammenfassen. | SQLite liefert die Ergebniszeilen. Das Backend ordnet pro Zeile jedem Spaltennamen seinen Wert zu. | Liest daraus die Werte für die Tabellenzellen, etwa `Daft Punk` und `1280`. |
+```
+{
+  "columns": ["artist_name", "stream_count"],
+  "rows": [
+    {"artist_name": "Daft Punk", "stream_count": 1280},
+    {"artist_name": "Massive Attack", "stream_count": 940}
+  ]
+}
+```
