@@ -1,4 +1,19 @@
 
+# SQL Schema und Daten
+
+
+
+### 2.3 seed.py Daten
+
+
+| Tabelle   | Anzahl | Inhalt                                  |
+| --------- | ------ | --------------------------------------- |
+| `artists` | 15     | Künstler mit unterschiedlichen Genres   |
+| `tracks`  | 50     | Musiktitel mit Künstler und Dauer       |
+| `streams` | 1.000  | Streaming-Ereignisse mit Datum und Land |
+
+
+
 
 # Dateien
 
