@@ -81,3 +81,13 @@
 | `schema_service.py` | Liest Tabellen, Spalten und Beziehungen aus SQLite aus. | Schema-Kontext für das LLM |
 | `sql_service.py` | Prüft die erzeugte SQL-Abfrage und führt sie aus, etwa mit `execute_read_query()`. | `columns` und `rows` für das Frontend |
 
+
+## Service-Dateien
+
+| Datei | Verantwortlichkeit |
+|---|---|
+| [analysis_service.py](backend/app/services/analysis_service.py) | **Steuert den Analyseablauf.** `analyze_question()` lädt die Projektregeln und das Datenbankschema, lässt SQL erzeugen und prüft auf die Modellantwort `UNSUPPORTED_QUERY`. Anschließend führt der Service die Abfrage über eine schreibgeschützte Verbindung aus und baut die `AnalysisResponse` mit Frage, erzeugtem SQL, Spalten und Zeilen. |
+| [context_service.py](backend/app/services/context_service.py) | **Lädt die fachlichen Vorgaben für das Modell.** `get_project_context()` liest vier Markdown-Dateien ein: die Text-to-SQL-Anleitung, die Geschäftsregeln, die SQL-Richtlinien und die Beispiele. Die Funktion überspringt leere Dateien und fasst die übrigen Inhalte zu einem Text zusammen. |
+| [sql_schema_service.py](backend/app/services/sql_schema_service.py) | **Liest das aktuelle Datenbankschema.** `get_schema_context()` ermittelt die Anwendungstabellen, Spalten, Datentypen, Primär- und Fremdschlüssel sowie `NOT NULL`-Angaben direkt aus SQLite. Daraus erzeugt die Funktion eine Textbeschreibung für das Modell. |
+| [llm_service.py](backend/app/services/llm_service.py) | **Übersetzt die Frage in SQL.** `generate_sql()` baut aus Projektregeln, SQLite-Version und Schema den Systemprompt und sendet die Frage an Ollama. Die Funktion gibt den Antworttext des Modells zurück und meldet HTTP-Fehler oder eine leere Antwort. |
+| [sql_service.py](backend/app/services/sql_service.py) | **Führt die erzeugte Abfrage aus.** `execute_read_query()` setzt einen SQLite-Authorizer mit einer Liste erlaubter Aktionen. Die Funktion gibt die Spaltennamen und bis zu 500 Ergebniszeilen als Dictionaries zurück. |
