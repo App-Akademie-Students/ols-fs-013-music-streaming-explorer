@@ -1,0 +1,1 @@
+# Führt die SQL-Abfrage über eine schreibgeschützte SQLite-Verbindung mit einem Authorizer aus und liefert die Spaltennamen und bis zu 500 Ergebniszeilen zurück.

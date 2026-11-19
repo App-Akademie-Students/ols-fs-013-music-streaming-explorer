@@ -9,3 +9,8 @@ Ergänze die seed.py  mit diesen Daten.
 \| \`artists\` | 15     | Künstler mit unterschiedlichen Genres   |\
 \| \`tracks\`  | 50     | Musiktitel mit Künstler und Dauer       |\
 \| \`streams\` | 1.000  | Streaming-Ereignisse mit Datum und Land |\
+
+
+## 2026-11-19 10:41:37 +01:00
+
+Passe in der README.md-Datei die aktuelle Projektstruktur an.

@@ -1,0 +1,1 @@
+# Liest die fachlichen Vorgaben aus vier Markdown-Dateien und fasst sie als Text für das Sprachmodell zusammen.

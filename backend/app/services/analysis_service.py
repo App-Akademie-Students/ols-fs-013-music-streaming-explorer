@@ -1,0 +1,1 @@
+# Steuert den Ablauf von der Analysefrage über die SQL-Erzeugung und -Ausführung bis zur fertigen AnalysisResponse.

@@ -83,18 +83,51 @@ SQLAlchemy ist in `requirements.txt` nur als auskommentierte Idee enthalten und 
 ## Projektstruktur
 
 ```text
-backend/
-  app/
-    main.py                 # Vorgesehener API-Einstiegspunkt
-    database.py             # SQLite-Verbindung und Platzhalter für Initialisierung
-    routes/analyses.py      # Vorgesehene Analyse-Endpunkte
-    schemas/analysis.py     # Vorgesehene Datenmodelle
-    services/llm_service.py # Vorgesehene LLM-Anbindung
-  context/                 # Dateien für SQL-Regeln, Beispiele und Geschäftsregeln
-  skills/text-to-sql/       # Grundgerüst für Text-to-SQL-Anweisungen
-  requirements.txt         # Python-Abhängigkeiten
-  schema.sql               # Tabellendefinitionen
-  seed.py                  # Platzhalter für Beispieldaten
-frontend/                  # Platzhalter für das Frontend
-learning/                  # Begleitmaterial
+├── .gitignore
+├── .vscode/
+│   └── settings.json
+├── AGENTS.md
+├── README.md
+├── backend/
+│   ├── app/
+│   │   ├── main.py                  # FastAPI-Einstiegspunkt
+│   │   ├── database.py              # SQLite-Verbindung und Initialisierung
+│   │   ├── routers/
+│   │   │   └── analyses_router.py    # Analyse-Endpunkt
+│   │   ├── schemas/
+│   │   │   └── analyses.py           # Pydantic-Modelle für Anfrage und Antwort
+│   │   └── services/
+│   │       ├── analysis_service.py  # Steuert den Analyseablauf
+│   │       ├── context_service.py   # Lädt die Projektregeln und Beispiele
+│   │       ├── llm_service.py       # Erzeugt SQL mit Ollama
+│   │       ├── sql_schema_service.py # Liest das SQLite-Schema zur Laufzeit
+│   │       └── sql_service.py       # Prüft und führt Leseabfragen aus
+│   ├── context/
+│   │   ├── business-rules.md
+│   │   ├── examples.md
+│   │   └── sql-guidelines.md
+│   ├── skills/
+│   │   └── text-to-sql/
+│   │       └── SKILL.md
+│   ├── music.db                     # SQLite-Datenbank
+│   ├── requirements.txt             # Python-Abhängigkeiten
+│   ├── schema.sql                   # Tabellendefinitionen
+│   └── seed.py                      # Erzeugt Beispieldaten
+├── frontend/                        # Platzhalter für das Frontend
+└── learning/                        # Begleitmaterial und Lernprotokoll
+    ├── learning-info.md
+    ├── Plan.pdf
+    ├── prompts.md
+    ├── schema-linking.png
+    └── workflow.png
 ```
+
+## Service-Dateien
+
+| Datei | Verantwortlichkeit |
+|---|---|
+| [analysis_service.py](backend/app/services/analysis_service.py) | **Steuert den Analyseablauf.** `analyze_question()` lädt die Projektregeln und das Datenbankschema, lässt SQL erzeugen und prüft auf die Modellantwort `UNSUPPORTED_QUERY`. Anschließend führt der Service die Abfrage über eine schreibgeschützte Verbindung aus und baut die `AnalysisResponse` mit Frage, erzeugtem SQL, Spalten und Zeilen. |
+| [context_service.py](backend/app/services/context_service.py) | **Lädt die fachlichen Vorgaben für das Modell.** `get_project_context()` liest vier Markdown-Dateien ein: die Text-to-SQL-Anleitung, die Geschäftsregeln, die SQL-Richtlinien und die Beispiele. Die Funktion überspringt leere Dateien und fasst die übrigen Inhalte zu einem Text zusammen. |
+| [sql_schema_service.py](backend/app/services/sql_schema_service.py) | **Liest das aktuelle Datenbankschema.** `get_schema_context()` ermittelt die Anwendungstabellen, Spalten, Datentypen, Primär- und Fremdschlüssel sowie `NOT NULL`-Angaben direkt aus SQLite. Daraus erzeugt die Funktion eine Textbeschreibung für das Modell. |
+| [llm_service.py](backend/app/services/llm_service.py) | **Übersetzt die Frage in SQL.** `generate_sql()` baut aus Projektregeln, SQLite-Version und Schema den Systemprompt und sendet die Frage an Ollama. Die Funktion gibt den Antworttext des Modells zurück und meldet HTTP-Fehler oder eine leere Antwort. |
+| [sql_service.py](backend/app/services/sql_service.py) | **Führt die erzeugte Abfrage aus.** `execute_read_query()` setzt einen SQLite-Authorizer mit einer Liste erlaubter Aktionen. Die Funktion gibt die Spaltennamen und bis zu 500 Ergebniszeilen als Dictionaries zurück. |

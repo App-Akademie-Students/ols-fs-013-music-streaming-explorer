@@ -1,0 +1,1 @@
+# Liest das aktuelle Schema direkt aus SQLite und beschreibt Tabellen, Spalten und Schlüssel für das Sprachmodell.
