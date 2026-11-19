@@ -15,3 +15,4 @@ def init_db():
     with get_connection() as conn:
         sql = SCHEMA_PATH.read_text(encoding="utf-8")
         conn.executescript(sql)
+

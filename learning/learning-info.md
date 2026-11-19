@@ -73,3 +73,11 @@
   ]
 }
 ```
+
+# Datenbank
+
+| Datei | Aufgabe | Ergebnis |
+|---|---|---|
+| `schema_service.py` | Liest Tabellen, Spalten und Beziehungen aus SQLite aus. | Schema-Kontext für das LLM |
+| `sql_service.py` | Prüft die erzeugte SQL-Abfrage und führt sie aus, etwa mit `execute_read_query()`. | `columns` und `rows` für das Frontend |
+
