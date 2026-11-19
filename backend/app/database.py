@@ -9,7 +9,12 @@ def get_connection():
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
-
+def get_readonly_connection():
+    """Gibt eine schreibgeschützte Verbindung zur SQLite-Datenbank zurück."""
+    conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 def init_db():
     with get_connection() as conn:

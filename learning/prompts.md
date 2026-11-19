@@ -14,3 +14,11 @@ Ergänze die seed.py  mit diesen Daten.
 ## 2026-11-19 10:41:37 +01:00
 
 Passe in der README.md-Datei die aktuelle Projektstruktur an.
+
+
+## 2026-11-19 11:49:32 +01:00
+
+vervollkomne die Funktion:
+Zeilen sammeln und am Ende verbinden, statt String bei jedem Schleifendurchlauf zu erweitern?
+Interne SQL- Leittabellen überspringen und Ausgabe sortieren.
+Type, Primärschlüssel und Not Null aufnehmen.

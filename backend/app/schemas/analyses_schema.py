@@ -7,7 +7,9 @@ class AnalysesRequest(BaseModel):
     question: str = Field(
         min_length=3,
         max_length=500,
-        description="Natürlichsprachliche Frage für die Analyse")
+        description="Natürlichsprachliche Frage für die Analyse",
+        example="Welcher Künstler hat die meisten Streams?"
+    )
 
 class AnalysesResponse(BaseModel):
     """Antwort auf die Analysefrage inklusive generiertem SQL, Spalten und Zeilen"""
