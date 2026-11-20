@@ -1,8 +1,12 @@
-fastapi # The web framework for building APIs with Python
+
+
+fastapi # The web framemework for building APIs with Python
 uvicorn[standard] # The ASGI server for running FastAPI applications
-pydantic # Data validation and settings management using Python type annotations
-# Database libraries idea: include libraries for interacting with databases, such as SQLAlchemy for ORM support
+pydantic # Data validation adn settings management using Python type annotations
+
+# Database and libraries idea: include libraries for interactting with databases, such SQLAlchemy for ORM support
 # sqlalchemy # SQL toolkit and Object-Relational Mapping (ORM) library for Python
+
 
 python-dotenv # For loading environment variables from a .env file
 httpx # For making HTTP requests in Python
