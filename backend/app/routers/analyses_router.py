@@ -13,4 +13,6 @@ async def analyze(request: AnalysesRequest):# FIXME: Implement the actual analys
     #     columns=["column1", "column2"],
     #     rows=[{"column1": "value1", "column2": "value2"}]
     # )
+    pass
+
     

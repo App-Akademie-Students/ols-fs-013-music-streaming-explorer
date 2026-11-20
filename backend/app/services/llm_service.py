@@ -2,16 +2,20 @@
 import httpx
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+OLLAMA_URL = os.getenv("OLLAMA_URL")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
 
-OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
 # FIXME impl
-def send_query_to_ollama(question: str, project_rules: str, schema: str, sqlite_version: str) -> str:
+def send_query_to_ollama(question: str, project_rules: str, sql_schema: str, sqlite_version: str) -> str:
     payload = {
         "query": question,
         "project_rules": project_rules,
-        "schema": schema,
+        "schema": sql_schema,
         "sqlite_version": sqlite_version
     }
-    response = httpx.post(OLLAMA_API_URL, json=payload)
+    response = httpx.post(OLLAMA_URL, json=payload)
     response.raise_for_status()
     return response.text
+

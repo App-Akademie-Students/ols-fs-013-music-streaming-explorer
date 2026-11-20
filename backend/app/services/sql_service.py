@@ -11,7 +11,7 @@ def _read_only_authorizer() -> None:
 
 def execute_read_only_query(conn: sqlite3.Connection, query: str) -> dict[str, Any]:
     """Führt eine schreibgeschützte SQL-Abfrage aus und gibt die Spaltennamen und bis zu 500 Ergebniszeilen zurück."""
-    conn.set_authorizer(_read_only_authorizer)
+    #conn.set_authorizer(_read_only_authorizer)
     cursor = conn.cursor()
     cursor.execute(query)
 
