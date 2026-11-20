@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
-from backend.app.schemas.analyses_schema import AnalysesRequest, AnalysesResponse
-
+from app.schemas.analyses_schema import AnalysesRequest, AnalysesResponse
+from app.services.analysis_service import analyze_query
 router = APIRouter(prefix="/analyses",tags=["analyses"])
 
 @router.post("/", response_model=AnalysesResponse)
-async def analyze(request: AnalysesRequest):# FIXME: Implement the actual analysis logic here
+async def analyze(request: AnalysesRequest):
     # Hier würde die Logik zur Analyse der Frage implementiert werden
     # Für den Moment geben wir eine Dummy-Antwort zurück
     # return AnalysesResponse(
@@ -13,6 +13,7 @@ async def analyze(request: AnalysesRequest):# FIXME: Implement the actual analys
     #     columns=["column1", "column2"],
     #     rows=[{"column1": "value1", "column2": "value2"}]
     # )
-    pass
+    
+    return analyze_query(request.question)
 
     

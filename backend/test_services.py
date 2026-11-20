@@ -16,20 +16,20 @@ def test():
     print(sql_schema)
 
 
-    # print("Testing LLM service...")# Test the LLM service with a sample query
+    print("Testing LLM service...")# Test the LLM service with a sample query
 
-    # sql= send_query_to_ollama(
-    #     question="Zeige mir die fünf Künstler mit den meisten Streams",
-    #     project_rules=  project_context, 
-    #     sql_schema=sql_schema, 
-    #     sqlite_version=sqlite3.sqlite_version
-    # )
-    # print(sql)
+    sql= send_query_to_ollama(
+        question="Zeige mir die fünf Künstler mit den meisten Streams",
+        project_rules=  project_context, 
+        sql_schema=sql_schema, 
+        sqlite_version=sqlite3.sqlite_version
+    )
+    print(sql)
 
 
-    # print("execute sql...")# Test executing the generated SQL query
-    # result=execute_read_only_query(get_readonly_connection(),sql)
-    # print(result)
+    print("execute sql...")# Test executing the generated SQL query
+    result=execute_read_only_query(get_readonly_connection(),sql)
+    print(result)
    
 
 

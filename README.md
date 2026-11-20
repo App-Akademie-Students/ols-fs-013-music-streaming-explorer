@@ -1,133 +1,66 @@
 # Music Streaming Explorer
 
-Python-Projekt zur Analyse von Musik-Streaming-Daten. Das Backend ist für eine FastAPI-API mit SQLite-Datenbank vorbereitet. Eine Text-to-SQL-Anbindung ist vorgesehen.
+Stelle Fragen zu Musik-Streaming-Daten und sieh dir die Ergebnisse als Tabelle oder Diagramm an. FastAPI lässt die Frage von Ollama in SQL übersetzen und liest die Daten aus SQLite. Die Oberfläche verwendet TypeScript, Vite und Chart.js.
 
-## Aktueller Stand
+## Frontend starten
 
-Das Datenbankschema und die SQLite-Verbindung sind vorhanden. Die API in `backend/app/main.py`, die Analyse-Routen, die Pydantic-Schemas, der LLM-Service und `backend/seed.py` sind noch nicht implementiert. `init_db()` ist ebenfalls ein Platzhalter. Das Verzeichnis `frontend/` enthält derzeit keine Anwendung.
+Vorausgesetzt sind Node.js mit npm und ein laufendes FastAPI-Backend unter `http://127.0.0.1:8000`. Wenn du das Backend zum ersten Mal startest, folge zuerst der [Backend-Anleitung](#backend-und-ollama-starten).
 
-## Voraussetzungen und Installation
-
-Benötigt werden Python 3 mit `venv` und `pip`. Die folgenden Befehle werden in PowerShell im Projektverzeichnis ausgeführt:
+Öffne ein eigenes PowerShell-Terminal im Projektstamm und führe diese Befehle aus:
 
 ```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+cd frontend
+npm ci
+npm run dev
 ```
 
-Die Befehle verwenden die virtuelle Umgebung direkt; eine Aktivierung ist nicht erforderlich.
+Öffne im Browser [http://localhost:5173](http://localhost:5173). Falls Vite einen anderen Port ausgibt, verwende die Adresse aus dem Terminal. Lass beide Terminals geöffnet. Vite leitet die Analyseanfragen automatisch an FastAPI weiter.
 
-## VS Code-Erweiterungen
+Führe `npm ci` bei der ersten Einrichtung und nach Änderungen an `package-lock.json` aus. Für spätere Starts genügt `npm run dev` im Ordner `frontend/`.
 
-Die folgenden Erweiterungen unterstützen die Arbeit mit Python und der SQLite-Datenbank. Installation über die Erweiterungsansicht (`Strg+Umschalt+X`); über die jeweilige Erweiterungs-ID lässt sich das passende Plugin eindeutig finden.
+## Backend und Ollama starten
 
-| Erweiterung | Herausgeber | Erweiterungs-ID | Zweck |
-| --- | --- | --- | --- |
-| [SQLite (SQLite Explorer)](https://marketplace.visualstudio.com/items?itemName=alexcvzz.vscode-sqlite) | alexcvzz | `alexcvzz.vscode-sqlite` | Datenbanken im SQLite Explorer durchsuchen und SQL-Abfragen ausführen |
-| [SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer) | Florian Klampfer | `qwtel.sqlite-viewer` | SQLite-Dateien öffnen und Tabelleninhalte anzeigen |
-| [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) | Microsoft | `ms-python.python` | Python-Unterstützung und Auswahl des Interpreters |
-| [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) | Microsoft | `ms-python.vscode-pylance` | Codevervollständigung, Typprüfung und Codenavigation |
-| [Python Debugger](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy) | Microsoft | `ms-python.debugpy` | Python-Code mit Haltepunkten debuggen |
+Du brauchst Python 3 mit `venv` und `pip` sowie Zugriff auf einen laufenden Ollama-Dienst mit einem verfügbaren Modell. Die Beispiele verwenden den lokalen Ollama-Port `11434`.
 
-Nach dem Anlegen der virtuellen Umgebung über `Strg+Umschalt+P` den Befehl `Python: Select Interpreter` aufrufen und `backend/.venv/Scripts/python.exe` auswählen. Hinweise zur Python-Einrichtung bietet die [offizielle VS Code-Anleitung](https://code.visualstudio.com/docs/python/python-tutorial).
+1. Öffne PowerShell im Projektstamm und installiere die Python-Abhängigkeiten:
 
-Nach der Datenbankinitialisierung lässt sich `backend/app/music.db` mit SQLite Viewer öffnen. Für SQL-Abfragen über die Befehlspalette `SQLite: Open Database` auswählen und dieselbe Datei im SQLite Explorer laden.
+   ```powershell
+   cd backend
+   python -m venv .venv
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   ```
 
-## Datenbank anlegen
+2. Lege bei der ersten Einrichtung die Ollama-Konfiguration an:
 
-Die Datenbank wird unter `backend/app/music.db` gespeichert. Bis `init_db()` implementiert ist, lässt sich das Schema aus dem Verzeichnis `backend/` so einspielen:
+   ```powershell
+   if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+   ```
+
+   Trage in `backend/.env` bei `OLLAMA_URL` die Adresse des laufenden Dienstes ein, lokal üblicherweise `http://localhost:11434`. Setze `OLLAMA_MODEL` auf den vollständigen Namen eines verfügbaren Modells. Bei einer lokalen Ollama-Installation zeigt `ollama list` die installierten Modelle. Ein fehlendes Modell kannst du mit `ollama pull <modellname>` laden. Läuft der lokale Dienst noch nicht, starte ihn in einem weiteren Terminal mit `ollama serve`.
+
+3. Starte FastAPI aus dem Ordner `backend/`:
+
+   ```powershell
+   .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+   ```
+
+   Unter [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) sollte `{"status":"healthy"}` erscheinen. Die interaktive API-Dokumentation findest du unter [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+
+Die SQLite-Datei `backend/music.db` liegt bereits im Repository. Falls sie fehlt oder die Tabellen leer sind, kannst du aus `backend/` Beispieldaten einspielen:
 
 ```powershell
-.\.venv\Scripts\python.exe -c "from pathlib import Path; from app.database import get_connection; conn = get_connection(); conn.executescript(Path('schema.sql').read_text(encoding='utf-8')); conn.commit(); conn.close()"
+.\.venv\Scripts\python.exe seed.py
 ```
 
-`CREATE TABLE IF NOT EXISTS` erlaubt das erneute Ausführen, ohne vorhandene Tabellen neu anzulegen. Bestehende Tabellenstrukturen werden dadurch nicht aktualisiert. Beispieldaten werden aktuell nicht erzeugt, da `seed.py` noch leer ist.
+## Anwendung benutzen
 
-Das Schema enthält drei Tabellen:
+1. Gib eine Frage mit 3 bis 500 Zeichen ein, etwa „Wie viele Streams gibt es pro Land?“, oder wähle eine der Beispielfragen.
+2. Klicke auf **Analysieren**. Die Tabelle zeigt bis zu 500 Ergebniszeilen.
+3. Bei numerischen Ergebnissen kannst du Kategorie, Messwert und Diagrammtyp wählen. Das Diagramm zeigt bis zu 30 Zeilen in Abfragereihenfolge.
+4. Öffne **Erzeugtes SQL anzeigen**, um die ausgeführte Abfrage einzusehen.
 
-| Tabelle | Spalten | Beziehung |
-| --- | --- | --- |
-| `artists` | `id`, `name`, `genre` | Künstler und Künstlerinnen |
-| `tracks` | `id`, `title`, `artist_id`, `duration` | `artist_id` verweist auf `artists.id` |
-| `streams` | `id`, `track_id`, `played_at`, `country` | `track_id` verweist auf `tracks.id` |
+Wenn die Analyse fehlschlägt, prüfe zuerst den FastAPI-Endpunkt `/health`. Wenn er erreichbar ist, prüfe die FastAPI-Ausgabe sowie die Ollama-Adresse und den Modellnamen in `backend/.env`.
 
-`get_connection()` liefert Zeilen als `sqlite3.Row` und aktiviert die Fremdschlüsselprüfung für jede Verbindung.
+## Frontend-Build
 
-## Backend starten
-
-Sobald in `backend/app/main.py` eine FastAPI-Instanz namens `app` implementiert ist, startet der Entwicklungsserver aus dem Verzeichnis `backend/` mit:
-
-```powershell
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
-```
-
-Danach ist die API standardmäßig unter <http://127.0.0.1:8000> erreichbar, die interaktive API-Dokumentation unter <http://127.0.0.1:8000/docs>. Im aktuellen Stand funktioniert dieser Startbefehl noch nicht, da die FastAPI-Instanz fehlt.
-
-## Module und Abhängigkeiten
-
-Die externen Pakete sind in `backend/requirements.txt` aufgeführt und für den weiteren Ausbau vorgesehen:
-
-| Modul / Paket | Zweck |
-| --- | --- |
-| `fastapi` | HTTP-API und Routing |
-| `uvicorn[standard]` | ASGI-Server zum Ausführen der API |
-| `pydantic` | Validierung und Definition von Datenmodellen |
-| `python-dotenv` | Laden lokaler Umgebungsvariablen aus `.env`-Dateien |
-| `httpx` | HTTP-Anfragen, beispielsweise an einen LLM-Dienst |
-| `sqlite3` | SQLite-Zugriff; Bestandteil der Python-Standardbibliothek |
-| `pathlib` | Dateipfade; Bestandteil der Python-Standardbibliothek |
-
-SQLAlchemy ist in `requirements.txt` nur als auskommentierte Idee enthalten und wird nicht installiert. Aktuell sind keine Umgebungsvariablen oder API-Schlüssel im Code eingerichtet. Lokale `.env`-Dateien sind über `.gitignore` ausgeschlossen.
-
-## Projektstruktur
-
-```text
-├── .gitignore
-├── .vscode/
-│   └── settings.json
-├── AGENTS.md
-├── README.md
-├── backend/
-│   ├── app/
-│   │   ├── main.py                  # FastAPI-Einstiegspunkt
-│   │   ├── database.py              # SQLite-Verbindung und Initialisierung
-│   │   ├── routers/
-│   │   │   └── analyses_router.py    # Analyse-Endpunkt
-│   │   ├── schemas/
-│   │   │   └── analyses.py           # Pydantic-Modelle für Anfrage und Antwort
-│   │   └── services/
-│   │       ├── analysis_service.py  # Steuert den Analyseablauf
-│   │       ├── context_service.py   # Lädt die Projektregeln und Beispiele
-│   │       ├── llm_service.py       # Erzeugt SQL mit Ollama
-│   │       ├── sql_schema_service.py # Liest das SQLite-Schema zur Laufzeit
-│   │       └── sql_service.py       # Prüft und führt Leseabfragen aus
-│   ├── context/
-│   │   ├── business-rules.md
-│   │   ├── examples.md
-│   │   └── sql-guidelines.md
-│   ├── skills/
-│   │   └── text-to-sql/
-│   │       └── SKILL.md
-│   ├── music.db                     # SQLite-Datenbank
-│   ├── requirements.txt             # Python-Abhängigkeiten
-│   ├── schema.sql                   # Tabellendefinitionen
-│   └── seed.py                      # Erzeugt Beispieldaten
-├── frontend/                        # Platzhalter für das Frontend
-└── learning/                        # Begleitmaterial und Lernprotokoll
-    ├── learning-info.md
-    ├── Plan.pdf
-    ├── prompts.md
-    ├── schema-linking.png
-    └── workflow.png
-```
-
-## Service-Dateien
-
-| Datei | Verantwortlichkeit |
-|---|---|
-| [analysis_service.py](backend/app/services/analysis_service.py) | **Steuert den Analyseablauf.** `analyze_question()` lädt die Projektregeln und das Datenbankschema, lässt SQL erzeugen und prüft auf die Modellantwort `UNSUPPORTED_QUERY`. Anschließend führt der Service die Abfrage über eine schreibgeschützte Verbindung aus und baut die `AnalysisResponse` mit Frage, erzeugtem SQL, Spalten und Zeilen. |
-| [context_service.py](backend/app/services/context_service.py) | **Lädt die fachlichen Vorgaben für das Modell.** `get_project_context()` liest vier Markdown-Dateien ein: die Text-to-SQL-Anleitung, die Geschäftsregeln, die SQL-Richtlinien und die Beispiele. Die Funktion überspringt leere Dateien und fasst die übrigen Inhalte zu einem Text zusammen. |
-| [sql_schema_service.py](backend/app/services/sql_schema_service.py) | **Liest das aktuelle Datenbankschema.** `get_schema_context()` ermittelt die Anwendungstabellen, Spalten, Datentypen, Primär- und Fremdschlüssel sowie `NOT NULL`-Angaben direkt aus SQLite. Daraus erzeugt die Funktion eine Textbeschreibung für das Modell. |
-| [llm_service.py](backend/app/services/llm_service.py) | **Übersetzt die Frage in SQL.** `generate_sql()` baut aus Projektregeln, SQLite-Version und Schema den Systemprompt und sendet die Frage an Ollama. Die Funktion gibt den Antworttext des Modells zurück und meldet HTTP-Fehler oder eine leere Antwort. |
-| [sql_service.py](backend/app/services/sql_service.py) | **Führt die erzeugte Abfrage aus.** `execute_read_query()` setzt einen SQLite-Authorizer mit einer Liste erlaubter Aktionen. Die Funktion gibt die Spaltennamen und bis zu 500 Ergebniszeilen als Dictionaries zurück. |
+Führe im Ordner `frontend/` nach der Installation `npm run build` aus. Der Befehl prüft die TypeScript-Typen und schreibt die Dateien nach `frontend/dist/`. Mit `npm run preview` kannst du den Build lokal öffnen. Auf einem Webserver muss `/api` an FastAPI weitergeleitet werden.

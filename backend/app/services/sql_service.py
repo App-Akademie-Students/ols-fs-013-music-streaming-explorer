@@ -2,11 +2,9 @@
 import sqlite3
 from typing import Any
 
-
+# TODO: Implement a read-only authorizer for SQLite connections.
 def _read_only_authorizer() -> None:
     pass
-
-
 
 
 def execute_read_only_query(conn: sqlite3.Connection, query: str) -> dict[str, Any]:
