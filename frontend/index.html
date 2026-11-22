@@ -1,14 +1,58 @@
 <!doctype html>
 <html lang="de">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f7f5" />
-    <meta name="description" content="Analysiere Musik-Streaming-Daten mit natürlichsprachlichen Fragen." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Musik-Streaming-Daten mit Fragen, Diagrammen und Tabellen erkunden.">
     <title>Music Streaming Explorer</title>
   </head>
   <body>
-    <div id="app"></div>
+    <header class="topbar">
+      <div class="shell brand"><span class="mark" aria-hidden="true">♫</span> Music Streaming Explorer</div>
+    </header>
+    <main class="shell">
+      <section class="intro" aria-labelledby="title">
+        <h1 id="title">Musikdaten erkunden.</h1>
+        <p>Stelle eine Frage zu Tracks, Künstlern oder Streams und sieh dir die Ergebnisse an.</p>
+      </section>
+      <section class="panel query" aria-label="Analyse starten">
+        <form id="analysis-form">
+          <label for="question">Deine Analysefrage</label>
+          <textarea id="question" name="question" minlength="3" maxlength="500" required
+            placeholder="Welche Künstler haben die meisten Streams?"></textarea>
+          <div class="actions">
+            <span id="count" aria-hidden="true">0 / 500</span>
+            <button id="submit" class="primary">Analysieren</button>
+          </div>
+        </form>
+        <div class="examples" aria-label="Beispielfragen">
+          <button type="button" data-question="Welche zehn Künstler haben die meisten Streams?">Top-Künstler</button>
+          <button type="button" data-question="Wie viele Streams gibt es pro Land?">Streams nach Land</button>
+          <button type="button" data-question="Wie viele Streams gab es pro Monat? Sortiere chronologisch.">Monatlicher Verlauf</button>
+        </div>
+      </section>
+      <p id="status" role="status" aria-live="polite"></p>
+      <section id="result" class="panel result" aria-labelledby="result-title" hidden>
+        <div class="result-header">
+          <div><h2 id="result-title">Ergebnis</h2><p id="analyzed-question"></p></div>
+          <span id="row-count"></span>
+        </div>
+        <section id="chart-section" aria-labelledby="chart-title" hidden>
+          <h3 id="chart-title">Diagramm</h3>
+          <div class="chart-controls">
+            <label>Kategorie<select id="category"></select></label>
+            <label>Messwert<select id="metric"></select></label>
+            <label>Ansicht<select id="chart-type"><option value="bar">Balken</option><option value="line">Linie</option></select></label>
+          </div>
+          <p id="chart-note"></p>
+          <div class="chart-frame"><canvas id="chart" role="img">Die Diagrammdaten stehen in der Ergebnistabelle.</canvas></div>
+        </section>
+        <h3 id="table-title">Ergebnistabelle</h3>
+        <p id="empty" hidden>Diese Abfrage hat keine Zeilen zurückgegeben.</p>
+        <div id="table-frame" tabindex="0" role="region" aria-labelledby="table-title"><table id="results-table"></table></div>
+        <details><summary>Erzeugtes SQL anzeigen</summary><pre id="sql"></pre></details>
+      </section>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
