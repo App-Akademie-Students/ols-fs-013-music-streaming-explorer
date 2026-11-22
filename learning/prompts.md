@@ -34,3 +34,8 @@ Analysiere das Backend und generiere ein Frontend mit den Technologien:TypeScrip
 ## 2026-11-20 13:01:39
 
 passe die README.md an: Relevante Informationen, die für die Benutzung der Anwendung wichtig sind. dazu Anweisung: Wie starte ich das Frontend?
+
+## 2026-11-22 17:27:39 +01:00
+
+Wie wird das aktuelle Backend gestartet?
+
